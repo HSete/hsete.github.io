@@ -168,7 +168,7 @@
 		<section class="pix-card" aria-labelledby="pix-title">
 			<h2 id="pix-title">Se possível, apoie pelo Pix:</h2>
 			
-			<img src="./img/qrcode.png" draggable="false" alt="" aria-label="QR Code para doação via Pix">
+			<img src="./img/qr-code.png" draggable="false" alt="" aria-label="QR Code para doação via Pix">
 			
 			<div class="pix-card-content">
 				<div class="pix-card-header">
@@ -235,6 +235,8 @@
 			}
 
 			redirectButton.onclick = function() {
+				window.onbeforeunload = () => ''
+
 				switch (true) {
 					case (gistParam !== ''):
 						window.open("https://gist.github.com/HSete/" + gistParam);
