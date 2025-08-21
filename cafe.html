@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<!--
+  Copyright (c) 2025 Humberto Freitas
+  https://www.youtube.com/@HSete
+-->
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HSete</title>
+  <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAB7C
+    AAAewgFu0HU+AAAAKUlEQVR42mNgGFTgPxIgRW6IGEBxGJBtwDsFrf/oeIgZgM2g4WzAgAAArWbvGo9Y1foAAAAASUVORK5CYII=">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      font-family: Arial;
+      color: #E6EDF3;
+      background: #0D1117;
+      user-select: none;
+    }
+
+    .page-container {
+      text-align: center;
+    }
+
+    .pix-card {
+      background-color: #161B22;
+      border: 10px solid #30363D;
+      border-radius: 10px;
+    }
+
+    .pix-card__title {
+      margin: 0;
+      padding: 20px 15px 10px;
+      font-size: 22px;
+    }
+
+    .pix-card__qr-code {
+      display: block;
+      width: 334px;
+      height: 334px;
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    .pix-card__content {
+      padding: 10px 15px 15px;
+    }
+
+    .pix-card__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .pix-card__key-wrapper {
+      padding: 8px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 14px;
+      text-align: center;
+      word-wrap: break-word;
+      background-color: #0D1117;
+    }
+
+    .copy-button {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: auto;
+      height: 40px;
+      padding: 0 12px;
+      border: 2px solid #30363D;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #E6EDF3;
+      background-color: #21262D;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .copy-button__icon {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+    
+    .copy-button:hover {
+      background: #292E36;
+    }
+
+    .copy-button:disabled {
+      border: 2px solid #238636;
+      color: #3FB950;
+      background-color: #292E36;
+      cursor: default;
+    }
+
+    .copy-button:disabled .copy-button__icon--copy {
+      display: none;
+    }
+
+    .copy-button:disabled .copy-button__icon--success {
+      display: block;
+    }
+
+    .redirect-button {
+      position: relative;
+      width: 300px;
+      height: 80px;
+      margin-top: 30px;
+      border: 2px solid #30363D;
+      border-radius: 5px;
+      font-size: 40px;
+      font-weight: bold;
+      color: #E6EDF3;
+      background: #21262D;
+      cursor: pointer;
+    }
+
+    .redirect-button:hover {
+      background: #292E36;
+    }
+
+    .redirect-button:disabled {
+      font-size: 30px;
+      color: #6E7681;
+      background-color: #161B22;
+      cursor: not-allowed;
+    }
+
+    .redirect-button:disabled:hover {
+      background: #161B22;
+    }
+
+    .redirect-button__loader {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 60px;
+      height: 60px;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    
+    .redirect-button__loader-background {
+      stroke: #30363D; 
+    }
+
+    .redirect-button__loader-circle {
+      stroke: #3FB950;
+      transition: stroke-dashoffset 1s linear;
+      transform-origin: center;
+      transform: rotate(-90deg);
+    }
+
+    .pix-card, .copy-button, .redirect-button {
+      box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.5);
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page-container">
+    <section class="pix-card" aria-labelledby="pix-card-title">
+      <h2 id="pix-card-title" class="pix-card__title">Se possível, apoie pelo Pix:</h2>
+
+      <img class="pix-card__qr-code" src="./img/qr-code.png" draggable="false" alt="" aria-label="QR Code para doação via Pix">
+
+      <div class="pix-card__content">
+        <div class="pix-card__header">
+          <span id="pix-key-label" class="pix-card__label">Chave Pix:</span>
+          <button id="copy-key-button" class="copy-button" aria-label="Copiar a chave Pix para a área de transferência">
+            <svg class="copy-button__icon copy-button__icon--copy" aria-hidden="true" viewBox="0 0 16 16">
+              <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5
+                       c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5
+                       A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path>
+              <path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5
+                       A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25
+                       a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5
+                       a.25.25 0 0 0-.25-.25Z"></path>
+            </svg>
+            <svg class="copy-button__icon copy-button__icon--success" display="none" aria-hidden="true" viewBox="0 0 16 16">
+              <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0
+                       L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018
+                       L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+            </svg>
+            <span id="copy-button-text" class="copy-button__text">Copiar</span>
+          </button>
+        </div>
+        <div class="pix-card__key-wrapper">
+          <span id="pix-key-text" class="pix-card__key-text" aria-labelledby="pix-key-label" aria-hidden="true">a44ef80e-0311-494f-b2c0-8338f82375f5</span>
+        </div>
+      </div>
+    </section>
+    <button id="redirect-button" class="redirect-button" aria-label="Ir para o download">
+      <span class="redirect-button__text" aria-live="polite"></span>
+      <svg class="redirect-button__loader" display="none" aria-hidden="true">
+        <circle class="redirect-button__loader-background" stroke-width="6" fill="transparent" r="27" cx="30" cy="30"/>
+        <circle class="redirect-button__loader-circle" stroke-width="6" fill="transparent" r="27" cx="30" cy="30"/>
+      </svg>
+    </button>
+  </main>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const redirectButton  = document.getElementById("redirect-button");
+      const buttonSpan      = document.querySelector('.redirect-button__text');
+      const countdownCircle = document.querySelector('.redirect-button__loader-circle');
+      const loaderSvg       = document.querySelector('.redirect-button__loader');
+      const circumference   = 2 * Math.PI * countdownCircle.r.baseVal.value;
+      const urlParams       = new URLSearchParams(window.location.search);
+      const pagePath        = urlParams.get('pag')  || '';
+      const gistId          = urlParams.get('gist') || '';
+      const hubReleaseTag   = urlParams.get('hub')  || '';
+      const jbrmReleaseTag  = urlParams.get('jbrm') || '';
+
+      countdownCircle.style.strokeDasharray = `${circumference} ${circumference}`;
+      countdownCircle.style.strokeDashoffset = circumference;
+
+      if (pagePath || gistId || hubReleaseTag || jbrmReleaseTag) {
+        loaderSvg.style.display = 'block';
+        redirectButton.disabled = true;
+
+        const totalSeconds = 7;
+        let secondsRemaining = totalSeconds;
+
+        buttonSpan.textContent = secondsRemaining;
+
+        const countdownInterval = setInterval(() => {
+          secondsRemaining--;
+
+          const progress = (totalSeconds - secondsRemaining) / (totalSeconds - 1);
+          const offset = circumference * (1 - progress);
+          countdownCircle.style.strokeDashoffset = offset;
+
+          if (secondsRemaining > 0) {
+            buttonSpan.textContent = secondsRemaining;
+          } else {
+            clearInterval(countdownInterval);
+            redirectButton.textContent = "Continuar";
+            redirectButton.disabled = false;
+          }
+        }, 1000);
+      } else {
+        redirectButton.textContent = "Youtube";
+      }
+
+      redirectButton.onclick = function() {
+        window.onbeforeunload = () => ''
+
+        if (pagePath) {
+          window.open("https://hsete.github.io/" + pagePath);
+        }
+        else if (gistId) {
+          window.open("https://gist.github.com/HSete/" + gistId);
+        }
+        else if (hubReleaseTag) {
+          window.open("https://github.com/HSete/HSete-Hub/releases/tag/" + hubReleaseTag);
+        }
+        else if (jbrmReleaseTag) {
+          window.open("https://github.com/HSete/jogos-ptBR-melhorias/releases/tag/" + jbrmReleaseTag);
+        }
+        else {
+          window.open("https://www.youtube.com/@HSete");
+        }
+      };
+    });
+
+    document.getElementById('copy-key-button').addEventListener('click', function() {
+      const copyButton = this;
+      const copyButtonText = document.getElementById('copy-button-text');
+      const pixKeyText = document.getElementById('pix-key-text').textContent;
+
+      copyButton.disabled = true;
+      copyButtonText.textContent = 'Copiado';
+
+      navigator.clipboard.writeText(pixKeyText).then(() => {
+        setTimeout(() => {
+          copyButton.disabled = false;
+          copyButtonText.textContent = 'Copiar';
+        }, 2000);
+      }).catch(err => {
+        copyButton.disabled = false;
+        copyButtonText.textContent = 'Copiar';
+      });
+    });
+  </script>
+</body>
+
+</html>

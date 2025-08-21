@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Downloads</title>
+  <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAB7CAAAewgF
+    u0HU+AAAANUlEQVR42mNgoBVwmfzjPzIeNYAIA9A1EMIUGUKRS8jyP1kBSbRmfAqIkiM3nqlvALmYYgMAmygpXIylTxAAAAAASUVORK5CYII=">
+  <style>
+    :root {
+      --bg-color-dark: #0D1117;
+      --bg-color-light: #161B22;
+      --text-color-primary: #E6EDF3;
+      --text-color-secondary: #8D96A0;
+      --border-color: #30363D;
+      --accent-color: #4493F8;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      color: var(--text-color-primary);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      text-align: center;
+      background-color: var(--bg-color-dark);
+      user-select: none;
+    }
+
+    .repository {
+      margin-bottom: 40px;
+    }
+
+    .repository__header {
+      display: flex;
+      justify-content: center;
+      max-width: 1200px;
+      margin: 0 auto 20px auto;
+    }
+
+    .repository__header-button {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border: 1px solid var(--border-color);
+      position: relative;
+      text-decoration: none;
+      transition: border-color 0.2s ease;
+    }
+    
+    .repository__header-button:first-child {
+      border-top-left-radius: 6px;
+      border-bottom-left-radius: 6px;
+    }
+
+    .repository__header-button:last-child {
+      margin-left: -1px;
+      border-top-right-radius: 6px;
+      border-bottom-right-radius: 6px;
+    }
+
+    .repository__header-button:hover {
+      border-color: var(--accent-color);
+      z-index: 1;
+    }
+
+    .repository__title {
+      color: var(--text-color-primary);
+      font-size: 1.1em;
+      font-weight: 600;
+      background-color: var(--bg-color-light);
+    }
+    
+    .repository__icon-svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+    
+    .repository__total-downloads {
+      color: var(--text-color-secondary);
+      font-size: 1.1em;
+      background-color: var(--bg-color-dark);
+    }
+
+    .repository__total-downloads-count {
+      color: var(--text-color-primary);
+      font-weight: bold;
+    }
+
+    .repository__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+
+    .release-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: inherit;
+      text-align: left;
+      text-decoration: none;
+      background-color: var(--bg-color-light);
+      transition: border-color 0.2s ease;
+    }
+
+    .release-card:hover {
+      border-color: var(--accent-color);
+    }
+    
+
+    .release-card__asset-name {
+      margin-bottom: 8px;
+      color: var(--accent-color);
+      font-size: 0.95em;
+      font-weight: bold;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .release-card__details {
+      display: flex;
+      align-items: center;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 0.8em;
+      overflow: hidden;
+    }
+
+    .release-card__date {
+      padding: 5px 8px;
+      border-right: 1px solid var(--border-color);
+      color: var(--text-color-secondary);
+    }
+
+    .release-card__downloads {
+      display: flex;
+      align-items: center;
+      flex-grow: 1;
+      gap: 6px;
+      padding: 5px 8px;
+      color: var(--text-color-secondary);
+      background-color: var(--bg-color-dark);
+    }
+
+    .release-card__downloads-count {
+      color: var(--text-color-secondary);
+      font-weight: bold;
+    }
+
+    .icon-download {
+      filter: grayscale(1) invert(60%) sepia(10%) saturate(300%) hue-rotate(170deg) brightness(95%) contrast(90%);
+    }
+
+    .icon-download--header {
+      height: 14px;
+      width: 14px;
+    }
+
+    .icon-download--card {
+      height: 12px;
+      width: 12px;
+    }
+
+    .loader {
+      grid-column: 1 / -1; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      padding: 40px;
+    }
+    
+    .loader__spinner {
+      width: 40px; 
+      height: 40px; 
+      border: 4px solid var(--border-color); 
+      border-top: 4px solid var(--accent-color);
+      border-radius: 50%; 
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin { 
+      0% { transform: rotate(0deg); } 
+      100% { transform: rotate(360deg); } 
+    }
+
+    footer { 
+      margin-top: 40px; 
+      color: var(--text-color-secondary); 
+      font-size: 0.9em; 
+    }
+
+    .hidden { 
+      display: none; 
+    }
+  </style>
+</head>
+<body>
+  <div id="app-container"></div>
+
+  <div id="loadingIndicator" class="loader">
+    <div class="loader__spinner"></div>
+    <p>Carregando dados...</p>
+  </div>
+
+  <footer>
+    <p>Copyright &copy; 2025 Humberto Freitas</p>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const REPO_URLS = [
+        'https://github.com/HSete/HSete-Hub',
+        'https://github.com/HSete/jogos-ptBR-melhorias',
+      ];
+
+      const ICON_DOWNLOAD_BASE64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAB7CAAA' +
+        'ewgFu0HU+AAAANUlEQVR42mNgoBVwmfzjPzIeNYAIA9A1EMIUGUKRS8jyP1kBSbRmfAqIkiM3nqlvALmYYgMAmygpXIylTxAAAAAASUVORK5CYII=';
+      
+      const appContainer = document.getElementById('app-container');
+      const loadingIndicator = document.getElementById('loadingIndicator');
+
+      async function processRepository(repoUrl) {
+        let repoName;
+        try {
+          repoName = new URL(repoUrl).pathname.substring(1);
+        } catch (e) {
+          console.error(`URL inválida fornecida: ${repoUrl}`);
+          return;
+        }
+
+        const apiUrl = `https://api.github.com/repos/${repoName}/releases`;
+        const totalDownloadsId = `totalDownloads-${repoName.replace(/[\/\.]/g, '-')}`;
+
+        const section = document.createElement('div');
+        section.className = 'repository';
+        section.innerHTML = `
+          <header class="repository__header">
+            <a href="${repoUrl}" target="_blank" class="repository__header-button repository__title">
+              <svg aria-hidden="true" viewBox="0 0 16 16" version="1.1" class="repository__icon-svg"><path d="
+                M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5
+                a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05
+                A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.486 2.486 0 0 1 4.5 9h8Z
+                M5 12.25a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v3.25a.25.25 0 0 1-.4.2
+                l-1.45-1.087a.249.249 0 0 0-.3 0L5.4 15.7a.25.25 0 0 1-.4-.2Z
+              "></path></svg>
+              <span>${repoName}</span>
+            </a>
+            <a href="${apiUrl}" target="_blank" class="repository__header-button repository__total-downloads">
+              <img src="${ICON_DOWNLOAD_BASE64}" class="icon-download icon-download--header">
+              <span id="${totalDownloadsId}" class="repository__total-downloads-count">0</span>
+            </a>
+          </header>
+          <main class="repository__grid"></main>
+        `;
+        appContainer.appendChild(section);
+
+        const releaseGrid = section.querySelector('.repository__grid');
+        const totalCountElement = document.getElementById(totalDownloadsId);
+
+        try {
+          const response = await fetch(apiUrl);
+          if (!response.ok) throw new Error(`Erro na API: ${response.statusText}`);
+          
+          const releases = await response.json();
+          let totalDownloads = 0;
+          const assetsToDisplay = [];
+
+          releases.forEach(release => {
+            release.assets.forEach(asset => {
+              if (asset.name.toLowerCase().includes('source code')) return;
+              
+              assetsToDisplay.push({
+                name: asset.name,
+                url: release.html_url,
+                downloads: asset.download_count,
+                updated: new Date(asset.updated_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+              });
+              totalDownloads += asset.download_count;
+            });
+          });
+
+          if (assetsToDisplay.length === 0) {
+            releaseGrid.innerHTML = '<p style="grid-column: 1 / -1;">Nenhum item para download encontrado.</p>';
+            return;
+          }
+
+          releaseGrid.innerHTML = assetsToDisplay.map(asset => `
+            <a href="${asset.url}" target="_blank" class="release-card">
+              <div class="release-card__asset-name" title="${asset.name}">${asset.name}</div>
+              <div class="release-card__details">
+                <span class="release-card__date">${asset.updated}</span>
+                <span class="release-card__downloads">
+                  <img src="${ICON_DOWNLOAD_BASE64}" class="icon-download icon-download--card">
+                  <span class="release-card__downloads-count">${asset.downloads.toLocaleString('pt-BR')}</span>
+                </span>
+              </div>
+            </a>
+          `).join('');
+
+          totalCountElement.textContent = totalDownloads.toLocaleString('pt-BR');
+
+        } catch (error) {
+          console.error(`Falha ao buscar dados de ${repoName}:`, error);
+          releaseGrid.innerHTML = '<p style="color: #ff6b6b; grid-column: 1 / -1;">Ocorreu um erro ao carregar os dados.</p>';
+        }
+      }
+
+      loadingIndicator.classList.remove('hidden');
+      try {
+        await Promise.all(REPO_URLS.map(url => processRepository(url)));
+      } finally {
+        loadingIndicator.classList.add('hidden');
+      }
+    });
+  </script>
+</body>
+
+</html>

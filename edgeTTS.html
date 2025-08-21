@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<!--
+  Copyright (c) 2025 Humberto Freitas
+  https://www.youtube.com/@HSete
+-->
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Texto em Fala</title>
+  <meta property="og:type" content="article"/>
+  <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAS0lEQ
+    VR42mNkoBAwUmzAfyDAqwAIaGsAMgdmGCFNZBsAkkeXI9oAdDmYYUQZgBxOyHJgQwjZgi9Qh4ABFIcB1WIBxUZ86YAcQLEBAO+0b/2JdmMqAAAAAElFTkSuQmCC">
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background-color: #161B22;
+    }
+
+    .app {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      padding: 20px;
+    }
+
+    .controls__button {
+      margin: 10px;
+      padding: 10px 20px;
+      border: 2px solid #30363D;
+      border-radius: 10px;
+      box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.5);
+      font-size: 25px;
+      color: #C9D1D9;
+      background-color: #21262D;
+      cursor: pointer;
+    }
+
+    .controls__button:hover {
+      background-color: #292E36;
+    }
+
+    .controls__button--clear {
+      color: #F84537;
+    }
+
+    .controls__button--clear:hover {
+      border-color: #BB383A;
+      color: white;
+      background-color: #B62324;
+    }
+
+    .controls__button--edge-open {
+      display: none;
+      color: #57D75B;
+    }
+    
+    .controls__button--edge-open:hover {
+      border-color: #37914A;
+      color: white;
+      background: #238636;
+    }
+
+    .controls__button--edge-down {
+      display: none;
+    }
+
+    .controls__button--donate {
+      color: #FCC419;
+    }
+    
+    .controls__button--donate:hover {
+      border-color: #A77B00;
+      color: white;
+      background: #A06E00;
+    }
+
+    .editor {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      min-height: 0;
+    }
+
+    .editor__input {
+      width: 100%;
+      height: 40%;
+      padding: 10px;
+      border-style: solid;
+      border-color: #30363D;
+      border-width: 10px 6px;
+      box-sizing: border-box;
+      font-size: 1.2em;
+      color: #C9D1D9;
+      background-color: #0D1117;
+      resize: none;
+      outline: none;
+    }
+
+    .editor__output {
+      display: block;
+      width: 100%;
+      height: 60%;
+      padding: 10px;
+      box-sizing: border-box;
+      font-size: 1.2em;
+      color: #8D96A0;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      overflow-y: auto;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 1000;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      overflow: auto;
+    }
+
+    .modal__content {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: auto;
+      max-width: 500px;
+    }
+    
+    .pix-card {
+      background-color: #161B22;
+      border: 10px solid #30363D;
+      border-radius: 10px;
+      box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.5);
+      color: #E6EDF3;
+      text-align: center;
+      font-weight: bold;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    .pix-card__title {
+      margin: 0;
+      padding: 20px 15px 10px;
+      font-size: 22px;
+    }
+
+    .pix-card__qr-code {
+      display: block;
+      width: 334px;
+      height: 334px;
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    .pix-card__content {
+      padding: 10px 15px 15px;
+    }
+
+    .pix-card__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 18px;
+    }
+
+    .pix-card__key-wrapper {
+      padding: 8px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 14px;
+      text-align: center;
+      word-wrap: break-word;
+      background-color: #0D1117;
+    }
+        
+    .pix-card__key {
+      font-weight: normal;
+    }
+
+    .pix-card__copy-button {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: auto;
+      height: 40px;
+      padding: 0 12px;
+      border: 2px solid #30363D;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #E6EDF3;
+      background-color: #21262D;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: 0px 4px 6px 0px rgba(0, 0, 0, 0.5);
+    }
+
+    .pix-card__copy-button svg {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+    
+    .pix-card__copy-button:hover {
+      background: #292E36;
+    }
+
+    .pix-card__copy-button:disabled {
+      border: 2px solid #238636;
+      color: #3FB950;
+      background-color: #292E36;
+      cursor: default;
+    }
+
+    .pix-card__copy-button:disabled svg:nth-of-type(1) {
+      display: none;
+    }
+
+    .pix-card__copy-button svg:nth-of-type(2) {
+      display: none;
+    }
+
+    .pix-card__copy-button:disabled svg:nth-of-type(2) {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <div class="controls">
+      <div>
+        <input type="button" id="button-clear" class="controls__button controls__button--clear" value="Limpar">
+      </div>
+      <div>
+        <input type="button" id="button-edge-open" class="controls__button controls__button--edge-open" value="Abrir no Edge" onclick="window.location.href = 'microsoft-edge:https://hsete.github.io/edgeTTS';">
+        <input type="button" id="button-tutorial" class="controls__button" value="Tutorial" onclick="window.open('https://youtu.be/sLFVEdzu5ak', '_blank');">
+        <input type="button" id="button-edge-download" class="controls__button controls__button--edge-down" value="Baixar Edge" onclick="window.open('https://www.microsoft.com/pt-BR/edge/download', '_blank');">
+        <input type="button" id="button-audacity" class="controls__button" value="Audacity" onclick="window.open('https://www.audacityteam.org/', '_blank');">
+        <input type="button" id="button-donate" class="controls__button controls__button--donate" value="Apoiar">
+      </div>
+    </div>
+    <div class="editor">
+      <textarea id="editor-input" class="editor__input"></textarea>
+      <span id="editor-output" class="editor__output" role="status" aria-live="polite"></span>
+    </div>
+  </div>
+
+  <div id="modal" class="modal">
+    <div class="modal__content" role="dialog" aria-modal="true" aria-labelledby="pix-card-title">
+      <section class="pix-card">
+        <h2 id="pix-card-title" class="pix-card__title">Se possível, apoie pelo Pix:</h2>
+
+        <img class="pix-card__qr-code" src="./img/qr-code.png" draggable="false" alt="" aria-label="QR Code para doação via Pix">
+
+        <div class="pix-card__content">
+          <div class="pix-card__header">
+            <span id="pix-card-label" class="pix-card__label">Chave Pix:</span>
+            <button id="pix-card-copy-button" class="pix-card__copy-button" aria-label="Copiar a chave Pix para a área de transferência">
+              <svg class="copy-button__icon copy-button__icon--copy" aria-hidden="true" viewBox="0 0 16 16">
+                <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5
+                         c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5
+                         A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path>
+                <path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5
+                         A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25
+                         a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5
+                         a.25.25 0 0 0-.25-.25Z"></path>
+              </svg>
+              <svg class="copy-button__icon copy-button__icon--success" display="none" aria-hidden="true" viewBox="0 0 16 16">
+                <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0
+                         L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018
+                         L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
+              </svg>
+              <span id="pix-card-copy-button-text">Copiar</span>
+            </button>
+          </div>
+          <div class="pix-card__key-wrapper">
+            <span id="pix-card-key" class="pix-card__key" aria-labelledby="pix-card-label" aria-hidden="true">a44ef80e-0311-494f-b2c0-8338f82375f5</span>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+  <script>
+    const editorInput           = document.getElementById('editor-input');
+    const editorOutput          = document.getElementById('editor-output');
+    const buttonEdgeOpen        = document.getElementById('button-edge-open');
+    const buttonEdgeDownload    = document.getElementById('button-edge-download');
+    const buttonClear           = document.getElementById('button-clear');
+    const buttonDonate          = document.getElementById('button-donate');
+    const modal                 = document.getElementById('modal');
+    const pixCardCopyButton     = document.getElementById('pix-card-copy-button');
+    const pixCardCopyButtonText = document.getElementById('pix-card-copy-button-text');
+    const pixCardKey            = document.getElementById('pix-card-key');
+
+    window.addEventListener('DOMContentLoaded', function() {
+      editorInput.value = '';
+      editorOutput.textContent = '';
+
+      if (navigator.userAgent.indexOf('Edg/') === -1) {
+        buttonEdgeOpen.style.display = 'inline-block';
+        buttonEdgeDownload.style.display = 'inline-block';
+      }
+    });
+
+    modal.addEventListener('click', function(event) {
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+
+    buttonClear.addEventListener('click', function() {
+      editorInput.value = '';
+      editorOutput.textContent = '';
+      editorInput.focus();
+    });
+
+    buttonDonate.addEventListener('click', function() {
+      modal.style.display = 'block';
+    });
+
+    editorInput.addEventListener('input', function() {
+      editorOutput.textContent = editorInput.value;
+    });
+
+    pixCardCopyButton.addEventListener('click', function() {
+      const pixKeyText = pixCardKey.textContent;
+
+      navigator.clipboard.writeText(pixKeyText).then(() => {
+        pixCardCopyButton.disabled = true;
+        pixCardCopyButtonText.textContent = 'Copiado';
+
+        setTimeout(() => {
+          pixCardCopyButton.disabled = false;
+          pixCardCopyButtonText.textContent = 'Copiar';
+        }, 2000);
+      }).catch(err => {
+        pixCardCopyButton.disabled = false;
+        pixCardCopyButtonText.textContent = 'Copiar';
+      });
+    });
+  </script>
+</body>
+
+</html>
