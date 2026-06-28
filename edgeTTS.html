@@ -319,14 +319,6 @@
     const pixCardCopyButtonText = document.getElementById('pix-card-copy-button-text');
     const pixCardKey            = document.getElementById('pix-card-key');
 
-    function generateRandomHash() {
-      return crypto.randomUUID().replace(/-/g, '').substring(0, 12);
-    }
-
-    function updateHash() {
-      window.history.replaceState(null, null, '#' + generateRandomHash());
-    }
-
     function updateLines(text, container) {
       container.innerHTML = ''; 
       const safeText = text || '';
@@ -339,15 +331,13 @@
     }
 
     window.addEventListener('DOMContentLoaded', function() {
-      const emptyP = document.createElement('p');
-      emptyP.id = 'empty-paragraph';
-      editorContainer.appendChild(emptyP);
+      editorContainer.insertAdjacentHTML('beforeend', '<p id="empty-p"></p>');
 
       const savedText = sessionStorage.getItem('edgeTTSText') || '';
       editorInput.value = savedText;
 
       updateLines(savedText, editorOutput);
-      updateHash();
+      window.history.replaceState(null, null, '#' + crypto.randomUUID().replace(/-/g, '').substring(0, 6));
 
       if (navigator.userAgent.indexOf('Edg/') === -1) {
         buttonEdgeOpen.style.display = 'inline-block';
@@ -363,9 +353,7 @@
 
     buttonClear.addEventListener('click', function() {
       sessionStorage.removeItem('edgeTTSText');
-      updateHash();
       editorInput.value = '';
-
       editorOutput.innerHTML = ''; 
       editorInput.focus();
     });
@@ -377,8 +365,6 @@
     editorInput.addEventListener('input', function() {
       const text = editorInput.value;
       sessionStorage.setItem('edgeTTSText', text);
-      updateHash();
-
       updateLines(text, editorOutput);
     });
 
