@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 
 <!--
-  Copyright (c) 2025 Humberto Freitas
+  Copyright (c) 2026 Humberto Freitas
   https://www.youtube.com/@HSete
 -->
 
@@ -116,6 +116,13 @@
       white-space: pre-wrap;
       word-wrap: break-word;
       overflow-y: auto;
+    }
+
+    .editor__output p {
+      margin: 0;
+      padding: 0;
+      line-height: 1.4;
+      min-height: 1.4em;
     }
 
     .modal {
@@ -260,12 +267,12 @@
     </div>
     <div class="editor">
       <textarea id="editor-input" class="editor__input"></textarea>
-      <span id="editor-output" class="editor__output" role="status" aria-live="polite"></span>
+	  <div id="editor-output" class="editor__output" aria-live="polite"></div>
     </div>
   </div>
 
-  <div id="modal" class="modal">
-    <div class="modal__content" role="dialog" aria-modal="true" aria-labelledby="pix-card-title">
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="modal__content">
       <section class="pix-card">
         <h2 id="pix-card-title" class="pix-card__title">Se possível, apoie pelo Pix:</h2>
 
@@ -274,8 +281,8 @@
         <div class="pix-card__content">
           <div class="pix-card__header">
             <span id="pix-card-label" class="pix-card__label">Chave Pix:</span>
-            <button id="pix-card-copy-button" class="pix-card__copy-button" aria-label="Copiar a chave Pix para a área de transferência">
-              <svg class="copy-button__icon copy-button__icon--copy" aria-hidden="true" viewBox="0 0 16 16">
+            <button id="pix-card-copy-button" class="pix-card__copy-button">
+              <svg class="copy-button__icon copy-button__icon--copy" viewBox="0 0 16 16">
                 <path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5
                          c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5
                          A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"></path>
@@ -284,7 +291,7 @@
                          a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5
                          a.25.25 0 0 0-.25-.25Z"></path>
               </svg>
-              <svg class="copy-button__icon copy-button__icon--success" display="none" aria-hidden="true" viewBox="0 0 16 16">
+              <svg class="copy-button__icon copy-button__icon--success" display="none" viewBox="0 0 16 16">
                 <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0
                          L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018
                          L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
@@ -293,15 +300,16 @@
             </button>
           </div>
           <div class="pix-card__key-wrapper">
-            <span id="pix-card-key" class="pix-card__key" aria-labelledby="pix-card-label" aria-hidden="true">67f35c42-d759-4db4-b97b-f87dff1e8fb5</span>
+            <span id="pix-card-key" class="pix-card__key">67f35c42-d759-4db4-b97b-f87dff1e8fb5</span>
           </div>
         </div>
       </section>
     </div>
   </div>
   <script>
+    const editorContainer       = document.querySelector('.editor');
     const editorInput           = document.getElementById('editor-input');
-    const editorOutput          = document.getElementById('editor-output');
+	const editorOutput          = document.getElementById('editor-output');
     const buttonEdgeOpen        = document.getElementById('button-edge-open');
     const buttonEdgeDownload    = document.getElementById('button-edge-download');
     const buttonClear           = document.getElementById('button-clear');
@@ -311,9 +319,35 @@
     const pixCardCopyButtonText = document.getElementById('pix-card-copy-button-text');
     const pixCardKey            = document.getElementById('pix-card-key');
 
+    function generateRandomHash() {
+      return crypto.randomUUID().replace(/-/g, '').substring(0, 12);
+    }
+
+    function updateHash() {
+      window.history.replaceState(null, null, '#' + generateRandomHash());
+    }
+
+    function updateLines(text, container) {
+      container.innerHTML = ''; 
+      const safeText = text || '';
+
+      safeText.split('\n').forEach(line => {
+        const p = document.createElement('p');
+        p.textContent = line; 
+        container.appendChild(p);
+      });
+    }
+
     window.addEventListener('DOMContentLoaded', function() {
-      editorInput.value = '';
-      editorOutput.textContent = '';
+      const emptyP = document.createElement('p');
+      emptyP.id = 'empty-paragraph';
+      editorContainer.appendChild(emptyP);
+
+      const savedText = sessionStorage.getItem('edgeTTSText') || '';
+      editorInput.value = savedText;
+
+      updateLines(savedText, editorOutput);
+      updateHash();
 
       if (navigator.userAgent.indexOf('Edg/') === -1) {
         buttonEdgeOpen.style.display = 'inline-block';
@@ -328,8 +362,11 @@
     });
 
     buttonClear.addEventListener('click', function() {
+      sessionStorage.removeItem('edgeTTSText');
+      updateHash();
       editorInput.value = '';
-      editorOutput.textContent = '';
+
+      editorOutput.innerHTML = ''; 
       editorInput.focus();
     });
 
@@ -338,7 +375,11 @@
     });
 
     editorInput.addEventListener('input', function() {
-      editorOutput.textContent = editorInput.value;
+      const text = editorInput.value;
+      sessionStorage.setItem('edgeTTSText', text);
+      updateHash();
+
+      updateLines(text, editorOutput);
     });
 
     pixCardCopyButton.addEventListener('click', function() {
